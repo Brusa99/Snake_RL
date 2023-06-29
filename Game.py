@@ -1,4 +1,5 @@
 import os
+
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 import random
@@ -8,11 +9,13 @@ from collections import namedtuple
 BLOCK_SIZE = 20
 SPEED = 10
 
+
 class Direction(Enum):
     RIGHT = 1
     LEFT = 2
     UP = 3
     DOWN = 4
+
 
 Point = namedtuple("Point", "x y")
 
@@ -24,10 +27,9 @@ DGREEN = (0, 153, 0)
 RED = (255, 0, 0)
 
 
-class SnakeGame():
-
+class SnakeGame:
     """
-    User controlled enviroment for the snake game
+    User controlled environment for the snake game
     """
 
     def __init__(self, w=32, h=26):
@@ -41,24 +43,23 @@ class SnakeGame():
         self.h = h
 
         # init display
-        self.display = pg.display.set_mode((self.w*BLOCK_SIZE + BLOCK_SIZE,
-                                            self.h*BLOCK_SIZE + BLOCK_SIZE
-                                            )                                            )
+        self.display = pg.display.set_mode((self.w * BLOCK_SIZE + BLOCK_SIZE,
+                                            self.h * BLOCK_SIZE + BLOCK_SIZE
+                                            ))
         pg.display.set_caption("Snake")
         self.clock = pg.time.Clock()
-        
+
         # init game state
         self.direction = Direction.DOWN
         # snake
-        self.head = Point(self.w//2, self.h//2)  # start in the center
+        self.head = Point(self.w // 2, self.h // 2)  # start in the center
         self.snake = [self.head,
-                    Point(self.head.x, self.head.y - 1),
-                    Point(self.head.x, self.head.y - 2),
-                ]
+                      Point(self.head.x, self.head.y - 1),
+                      Point(self.head.x, self.head.y - 2),
+                      ]
         self.score = 0
         self.food = None
         self._place_food()
-
 
     def _place_food(self):
         """
@@ -71,7 +72,6 @@ class SnakeGame():
         # check if it is a valid position
         if self.food in self.snake:
             self._place_food()
-
 
     def play_step(self):
         """
@@ -87,7 +87,7 @@ class SnakeGame():
                 quit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_LEFT:
-                    self.direction = Direction.LEFT        
+                    self.direction = Direction.LEFT
                 elif event.key == pg.K_RIGHT:
                     self.direction = Direction.RIGHT
                 elif event.key == pg.K_UP:
@@ -99,7 +99,7 @@ class SnakeGame():
         self._move(self.direction)  # updates the head
         self.snake.insert(0, self.head)
         # if no food is eaten then the last body piece will be popped
-        
+
         # check reward/block
         game_over = False
         if self._is_collision():
@@ -117,7 +117,6 @@ class SnakeGame():
 
         # end step
         return game_over, self.score
-
 
     def _move(self, direction):
         """
@@ -138,7 +137,6 @@ class SnakeGame():
             y += 1
         self.head = Point(x, y)
 
-
     def _is_collision(self):
         """
         helper function to determine if the movement is valid
@@ -146,7 +144,7 @@ class SnakeGame():
         # print("x: {}, y: {}, w: {}, h: {}".format(self.head.x, self.head.y, self.w, self.h))
         # print("head:", self.head, "\nbody:", self.snake)
 
-        # only head is checked since body must gave already been in a valid position
+        # only head is checked since body must have already been in a valid position
         # check boundaries
         if self.head.x > self.w or self.head.x < 0 or self.head.y > self.h or self.head.y < 0:
             return True
@@ -156,7 +154,6 @@ class SnakeGame():
         # else no collision
         return False
 
-
     def _update_ui(self):
         """
         helper function to update user interface
@@ -165,25 +162,24 @@ class SnakeGame():
         # draw snake
         for pt in self.snake:
             pg.draw.rect(self.display,
-                    GREEN,
-                    pg.Rect(pt.x*BLOCK_SIZE, pt.y*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
-                    )
+                         GREEN,
+                         pg.Rect(pt.x * BLOCK_SIZE, pt.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
+                         )
         pg.draw.rect(self.display,
-                DGREEN,
-                pg.Rect(self.head.x*BLOCK_SIZE, self.head.y*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
-                )
+                     DGREEN,
+                     pg.Rect(self.head.x * BLOCK_SIZE, self.head.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
+                     )
 
         pg.draw.rect(self.display,
-                RED,
-                pg.Rect(self.food.x*BLOCK_SIZE, self.food.y*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
-                )
+                     RED,
+                     pg.Rect(self.food.x * BLOCK_SIZE, self.food.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
+                     )
 
         # display score
         text = font.render("Score: {}".format(str(self.score)), True, BLACK)
         self.display.blit(text, [0, 0])
 
         pg.display.flip()
-
 
 
 if __name__ == "__main__":
