@@ -1,7 +1,5 @@
 import os
 
-import pygame
-
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 import numpy as np
@@ -10,7 +8,7 @@ from enum import Enum
 from collections import namedtuple
 
 BLOCK_SIZE = 20
-SPEED = 10
+SPEED = 40
 MAX_ITER = 100
 
 
@@ -21,15 +19,9 @@ class Direction(Enum):
     DOWN = 4
 
 
-class Action(Enum):
-    """
-    Agent can take three possible action.
-    turning back is always suicide so it is removed to reduce model complexity.
-    """
-    LEFT_TURN = np.array([1, 0, 0])
-    STRAIGHT = np.array([0, 1, 0])
-    RIGHT_TURN = np.array([0, 0, 1])
-
+LEFT_TURN = np.array([1, 0, 0])
+STRAIGHT = np.array([0, 1, 0])
+RIGHT_TURN = np.array([0, 0, 1])
 
 Point = namedtuple("Point", "x y")
 
@@ -40,9 +32,8 @@ GREEN = (0, 255, 0)
 DGREEN = (0, 153, 0)
 RED = (255, 0, 0)
 
+pg.init()
 font = pg.font.Font('arial.ttf', 25)
-
-
 class SnakeGameAI:
     """
     AI controlled environment for the snake game
@@ -59,7 +50,6 @@ class SnakeGameAI:
         self.h = h
 
         # init environment
-        pygame.init()
         self.display = pg.display.set_mode((self.w * BLOCK_SIZE + BLOCK_SIZE,
                                             self.h * BLOCK_SIZE + BLOCK_SIZE
                                             ))
@@ -124,7 +114,7 @@ class SnakeGameAI:
         game_over = False
 
         # collision check
-        if self._is_collision():
+        if self.is_collision():
             game_over = True
             reward = -1
             return reward, game_over, self.score
@@ -159,11 +149,11 @@ class SnakeGameAI:
         # determine direction based on action ~ maps action to direction
         clock_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
         idx = clock_wise.index(self.direction)
-        if np.array_equal(action, Action.LEFT_TURN):
+        if np.array_equal(action, LEFT_TURN):
             new_dir = clock_wise[(idx - 1) % 4]
-        elif np.array_equal(action, Action.STRAIGHT):
+        elif np.array_equal(action, STRAIGHT):
             new_dir = clock_wise[idx]
-        else:  # np.array_equal(action, Action.RIGHT_TURN):
+        else:  # np.array_equal(action, RIGHT_TURN):
             new_dir = clock_wise[(idx + 1) % 4]
 
         self.direction = new_dir
@@ -183,9 +173,9 @@ class SnakeGameAI:
             y += 1
         self.head = Point(x, y)
 
-    def _is_collision(self, pt=None):
+    def is_collision(self, pt=None):
         """
-        helper function to determine if the movement is valid in a generic point pt
+        helper function to determine if position pt is valid
         """
         if pt is None:
             pt = self.head

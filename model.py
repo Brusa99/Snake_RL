@@ -3,6 +3,7 @@ import torch as th
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import numpy as np
 
 class LinearQNet(nn.Module):
     """
@@ -51,10 +52,10 @@ class QTrainer:
         step of the training phase
         """
         # convert everything to tensors
-        state = th.tensor(state, dtype=th.float)
-        action = th.tensor(action, dtype=th.int)
-        reward = th. tensor(reward, dtype=th.float)
-        next_state = th.tensor(next_state, dtype=th.float)
+        state = th.tensor(np.array(state), dtype=th.float)
+        action = th.tensor(np.array(action), dtype=th.int)
+        reward = th. tensor(np.array(reward), dtype=th.float)
+        next_state = th.tensor(np.array(next_state), dtype=th.float)
 
         # function must be able to handle multiple sizes
         # we want the tensors in the form (NUMBER_OF_BATCHES, x)
@@ -65,7 +66,7 @@ class QTrainer:
             action = th.unsqueeze(action, 0)
             next_state = th.unsqueeze(next_state, 0)
             reward = th.unsqueeze(reward, 0)
-            done = (done, )
+            game_over = (game_over, )
 
         # implement the Q learning algorithm
         # Q_new = R + gamma * max(Q(S',A') - Q(S,A))

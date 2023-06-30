@@ -4,6 +4,7 @@ import numpy as np
 from collections import deque
 
 from AIGame import SnakeGameAI, Direction, Point
+from model import LinearQNet, QTrainer
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1_000
@@ -25,13 +26,13 @@ class Agent:
         """
         self.n_games = 0
         self.epsilon = 0  # exploration parameter
-        self.gamma = 0
+        self.gamma = 0.9  # must be in (0,1)
         self.memory = deque(maxlen=MAX_MEMORY)  # deque auto removes (FIFO) elements when len exceeds max parameter
 
-        self.model = None
-        self.trainer = None
+        # as a model we take a ffnn, input size is |S|, output size is |A|.
+        self.model = LinearQNet(11, 256, 3)  # number of neurons in the hidden layer may be changed
+        self.trainer = QTrainer(model=self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
 
-    @staticmethod
     def get_state(self, game: SnakeGameAI):
         """
         This function returns State an 11-dimensional tuple:

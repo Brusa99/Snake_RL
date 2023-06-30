@@ -10,7 +10,7 @@ def plot(scores, mean_scores):
     helper function to plot the training results
     """
     display.clear_output(wait=True)
-    display.display(plt.gfc())
+    display.display(plt.gcf())
     plt.clf()
     plt.title("Training...")
     plt.xlabel("# of games")
@@ -18,8 +18,9 @@ def plot(scores, mean_scores):
     plt.plot(scores)
     plt.plot(mean_scores)
     plt.ylim(ymin=0)
-    plt.text(len(scores)-1, scores[-1], str(scores[-1]))
-    plt.text(len(mean_scores)-1, mean_scores[-1], str(mean_scores[-1]))
+    plt.text(len(scores) - 1, scores[-1], str(scores[-1]))
+    plt.text(len(mean_scores) - 1, mean_scores[-1], str(mean_scores[-1]))
+
 
 def train():
     """
@@ -37,7 +38,7 @@ def train():
 
     # train loop
     while True:
-        state_old = agent.get_state(environment)
+        state_old = agent.get_state(game=environment)
 
         # move
         action = agent.get_action(state_old)
@@ -67,13 +68,6 @@ def train():
             # plot
             print("Game: {}, Score: {}, Record: {}".format(agent.n_games, score, record))
             plot(plot_scores, plot_mean_scores)
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
