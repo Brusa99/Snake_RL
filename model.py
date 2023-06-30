@@ -44,7 +44,7 @@ class QTrainer:
         self.gamma = gamma
 
         # optimizer
-        self.optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        self.optimizer = optim.Adam(model.parameters(), lr=self.lr)
         self.criterion = nn.MSELoss()  # mean squared error
 
     def train_step(self, state, action, reward, next_state, game_over):
@@ -53,7 +53,7 @@ class QTrainer:
         """
         # convert everything to tensors
         state = th.tensor(np.array(state), dtype=th.float)
-        action = th.tensor(np.array(action), dtype=th.int)
+        action = th.tensor(np.array(action), dtype=th.long)
         reward = th. tensor(np.array(reward), dtype=th.float)
         next_state = th.tensor(np.array(next_state), dtype=th.float)
 
@@ -75,11 +75,13 @@ class QTrainer:
         for idx in range(len(game_over)):  # the size of all tensors is the same
             Q_new = reward[idx]
             if not game_over[idx]:  # do not apply the algorithm if it led to game over
-                Q_new += self.gamma * th.max(self.model(next_state[idx]))
+                Q_new = reward[idx] + self.gamma * th.max(self.model(next_state[idx]))
             target[idx][th.argmax(action).item()] = Q_new
 
         # measure error
         self.optimizer.zero_grad()
         loss = self.criterion(target, pred_action)
         loss.backward()
+
+        self.optimizer.step()
         return

@@ -9,7 +9,7 @@ from model import LinearQNet, QTrainer
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1_000
 LEARNING_RATE = .001
-EPSILON_ZERO = 50  # starting exploration parameter
+EPSILON_ZERO = 80  # starting exploration parameter
 
 
 class Agent:
@@ -89,6 +89,7 @@ class Agent:
             food.y < head.y,  # up
             food.y > head.y,  # down
         ]
+        # print("\nDangers:", *state[0:3], "\nDirections:", *state[3:7], "\nFood:", *state[7:])
         return np.array(state, dtype=int)  # int dtype to convert in 0,1 matrix
 
     def remember(self, state, action, reward, next_state, game_over):
@@ -136,16 +137,16 @@ class Agent:
         action = [0, 0, 0]
 
         # update epsilon
-        self.epsilon = EPSILON_ZERO - (self.n_games / 2)  # note that epsilon can become negative => no more exploration
+        self.epsilon = EPSILON_ZERO - self.n_games  # note that epsilon can become negative => no more exploration
 
         # randomly take action with probability epsilon
-        if random.randint(0, 100) < self.epsilon:
+        if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
             action[move] = 1
 
         # or choose best action
         else:
-            state = th. tensor(state, dtype=th.float)  # convert to tensor for the nn model
+            state = th.tensor(state, dtype=th.float)  # convert to tensor for the nn model
             prediction = self.model(state)  # outputs raw value
             move = th.argmax(prediction).item()
             action[move] = 1

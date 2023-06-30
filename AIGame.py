@@ -7,7 +7,7 @@ import random
 from enum import Enum
 from collections import namedtuple
 
-BLOCK_SIZE = 20
+BLOCK_SIZE = 40
 SPEED = 40
 MAX_ITER = 100
 
@@ -34,6 +34,8 @@ RED = (255, 0, 0)
 
 pg.init()
 font = pg.font.Font('arial.ttf', 25)
+
+
 class SnakeGameAI:
     """
     AI controlled environment for the snake game
@@ -116,20 +118,20 @@ class SnakeGameAI:
         # collision check
         if self.is_collision():
             game_over = True
-            reward = -1
+            reward = -10
             return reward, game_over, self.score
 
         # if snake is doing nothing for too long => game over
         # might replace with a small negative reward at each iteration
         if self.iteration > MAX_ITER * len(self.snake):
             game_over = True
-            reward = -1
+            reward = -10
             return reward, game_over, self.score
 
         # reward
         if self.head == self.food:  # ate foot
             self.score += 1
-            reward = 1
+            reward = 10
             self._place_food()
         else:
             self.snake.pop()
