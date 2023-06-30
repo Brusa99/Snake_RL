@@ -112,7 +112,7 @@ class SnakeGameAI:
         # if no food is eaten then the last body piece will be popped
 
         # check reward/block
-        reward = 0  # might try -0.001
+        reward = -0.1  # might try -0.001
         game_over = False
 
         # collision check
@@ -131,7 +131,7 @@ class SnakeGameAI:
         # reward
         if self.head == self.food:  # ate foot
             self.score += 1
-            reward = 10
+            reward = 15
             self._place_food()
         else:
             self.snake.pop()
