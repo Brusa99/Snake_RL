@@ -1,3 +1,6 @@
+import os.path
+import sys
+import getopt
 import matplotlib.pyplot as plt
 from IPython import display
 
@@ -5,6 +8,7 @@ from Agent import Agent
 from AIGame import SnakeGameAI
 
 plt.ion()
+
 
 def plot(scores, mean_scores):
     """
@@ -25,7 +29,7 @@ def plot(scores, mean_scores):
     plt.pause(.1)
 
 
-def train():
+def train(file_name, steps, img_name):
     """
     trains the agent
     """
@@ -40,7 +44,7 @@ def train():
     environment = SnakeGameAI(w=8, h=8)
 
     # train loop
-    while True:
+    while agent.n_games <= steps:
         state_old = agent.get_state(game=environment)
 
         # move
@@ -58,20 +62,63 @@ def train():
             environment.reset()
             agent.n_games += 1
             agent.train_lm()
-            
-			# save scores
+
+            # save scores
             plot_scores.append(score)
             total_score += score
             plot_mean_scores.append(total_score / agent.n_games)
 
             if score > record:
                 record = score
-                agent.model.save("data/model.pth")
+                agent.model.save(file_name)
 
             # plot
             print("Game: {}, Score: {}, Record: {}".format(agent.n_games, score, record))
             plot(plot_scores, plot_mean_scores)
 
+    # save images
+    plt.savefig(img_name)
+
+def main(argv):
+    # init variables
+    file_name = "data/model.pth"
+    img_name = "data/graph.png"
+    steps = 1000
+
+    # get command line arguments
+    opts, args = getopt.getopt(argv, "hf:s:n:", ["file=", "steps=", "name="])
+    for opt, arg in opts:
+        # help
+        if opt == "-h":
+            print("train_driver.py -f <filename> -s <steps>")
+            print("\t-f path to output file")
+            print("\t-s steps to perform")
+            print("\t-n name of the image to save")
+            print("saved models/image are put in the data directory, extension is automatically added")
+            sys.exit()
+        # output file
+        elif opt in ("-f", "--file"):
+            file_name = "data/"
+            file_name += arg
+            file_name += ".pth"
+        # steps
+        elif opt in ("-s", "--steps"):
+            steps = int(arg)
+        # image name
+        elif opt in ("-n", "--name"):
+            img_name = "data/"
+            img_name += arg
+            # avoid overwriting
+            counter = 2
+            while os.path.exists(img_name + ".png"):
+                img_name += str(counter)
+                counter += 1
+            img_name += ".png"
+
+    # execute
+    train(file_name=file_name, steps=steps, img_name=img_name)
+
+
 
 if __name__ == "__main__":
-    train()
+    main(sys.argv[1:])
