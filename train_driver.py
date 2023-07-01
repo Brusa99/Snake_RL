@@ -79,6 +79,7 @@ def train(file_name, steps, img_name):
     # save images
     plt.savefig(img_name)
 
+
 def main(argv):
     # init variables
     file_name = "data/model.pth"
@@ -109,15 +110,16 @@ def main(argv):
             img_name = "data/"
             img_name += arg
             # avoid overwriting
-            counter = 2
-            while os.path.exists(img_name + ".png"):
-                img_name += str(counter)
-                counter += 1
-            img_name += ".png"
+            if os.path.exists(img_name + ".png"):
+                counter = 2
+                while os.path.exists(img_name + str(counter) + ".png"):
+                    counter += 1
+                img_name += str(counter) + ".png"
+            else:
+                img_name += ".png"
 
     # execute
     train(file_name=file_name, steps=steps, img_name=img_name)
-
 
 
 if __name__ == "__main__":

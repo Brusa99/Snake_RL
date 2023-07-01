@@ -5,6 +5,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 
+
 class LinearQNet(nn.Module):
     """
     Feed forward network with one hidden layer
@@ -34,10 +35,12 @@ class LinearQNet(nn.Module):
         th.save(self.state_dict(), file_name)
         return None
 
+
 class QTrainer:
     """
     implements the Q-Learning algorithm to a linear neural network
     """
+
     def __init__(self, model, learning_rate, gamma):
         self.lr = learning_rate
         self.model = model
@@ -54,7 +57,7 @@ class QTrainer:
         # convert everything to tensors
         state = th.tensor(np.array(state), dtype=th.float)
         action = th.tensor(np.array(action), dtype=th.long)
-        reward = th. tensor(np.array(reward), dtype=th.float)
+        reward = th.tensor(np.array(reward), dtype=th.float)
         next_state = th.tensor(np.array(next_state), dtype=th.float)
 
         # function must be able to handle multiple sizes
@@ -66,7 +69,7 @@ class QTrainer:
             action = th.unsqueeze(action, 0)
             next_state = th.unsqueeze(next_state, 0)
             reward = th.unsqueeze(reward, 0)
-            game_over = (game_over, )
+            game_over = (game_over,)
 
         # implement the Q learning algorithm
         # Q_new = R + gamma * max(Q(S',A') - Q(S,A))
