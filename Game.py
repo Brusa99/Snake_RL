@@ -6,8 +6,8 @@ import random
 from enum import Enum
 from collections import namedtuple
 
-BLOCK_SIZE = 20
-SPEED = 10
+BLOCK_SIZE = 40
+SPEED = 5
 
 
 class Direction(Enum):
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     # init
     pg.init()
     font = pg.font.Font('arial.ttf', 25)
-    game = SnakeGame(32, 26)
+    game = SnakeGame(8, 8)
     # print("-----game started-----")
 
     # game loop

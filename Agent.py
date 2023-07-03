@@ -25,7 +25,7 @@ class Agent:
         memory [deque] : agent memory
         """
         self.n_games = 0
-        self.epsilon = 0  # exploration parameter
+        self.epsilon = EPSILON_ZERO  # exploration parameter
         self.gamma = 0.9  # must be in (0,1)
         self.memory = deque(maxlen=MAX_MEMORY)  # deque auto removes (FIFO) elements when len exceeds max parameter
 
@@ -89,7 +89,7 @@ class Agent:
             food.y < head.y,  # up
             food.y > head.y,  # down
         ]
-        # print("\nDangers:", *state[0:3], "\nDirections:", *state[3:7], "\nFood:", *state[7:])
+        # print("\nDangers:", *state[0:3], "\nDirections:", *state[3:7], "\nFood:", *state[7:])  # debug
         return np.array(state, dtype=int)  # int dtype to convert in 0,1 matrix
 
     def remember(self, state, action, reward, next_state, game_over):
@@ -137,7 +137,10 @@ class Agent:
         action = [0, 0, 0]
 
         # update epsilon
-        self.epsilon = EPSILON_ZERO - self.n_games  # note that epsilon can become negative => no more exploration
+        # method 1
+        # self.epsilon = EPSILON_ZERO - self.n_games  # note that epsilon can become negative => no more exploration
+        # method 2
+        self.epsilon = self.epsilon*0.99
 
         # randomly take action with probability epsilon
         if random.randint(0, 200) < self.epsilon:
@@ -150,4 +153,5 @@ class Agent:
             prediction = self.model(state)  # outputs raw value
             move = th.argmax(prediction).item()
             action[move] = 1
+
         return action

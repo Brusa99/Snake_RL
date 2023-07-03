@@ -8,7 +8,8 @@ import numpy as np
 
 class LinearQNet(nn.Module):
     """
-    Feed forward network with one hidden layer
+    Feed forward network with one hidden layer.
+    Neurons apply linear transformation y = xA^T + b
     """
 
     def __init__(self, input_size, hidden_size, output_size):
@@ -72,7 +73,7 @@ class QTrainer:
             game_over = (game_over,)
 
         # implement the Q learning algorithm
-        # Q_new = R + gamma * max(Q(S',A') - Q(S,A))
+        # Q_new += R + gamma * max(Q(S',A') - Q(S,A))
         pred_action = self.model(state)
         target = pred_action.clone()
         for idx in range(len(game_over)):  # the size of all tensors is the same
@@ -81,10 +82,10 @@ class QTrainer:
                 Q_new = reward[idx] + self.gamma * th.max(self.model(next_state[idx]))
             target[idx][th.argmax(action).item()] = Q_new
 
-        # measure error
+        # optimization step
         self.optimizer.zero_grad()
         loss = self.criterion(target, pred_action)
         loss.backward()
-
         self.optimizer.step()
+
         return
