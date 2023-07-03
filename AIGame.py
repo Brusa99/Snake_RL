@@ -8,7 +8,7 @@ from enum import Enum
 from collections import namedtuple
 
 BLOCK_SIZE = 40
-SPEED = 40
+SPEED = 400
 MAX_ITER = 100
 
 
@@ -19,9 +19,18 @@ class Direction(Enum):
     DOWN = 4
 
 
+# actions 3
+
 LEFT_TURN = np.array([1, 0, 0])
 STRAIGHT = np.array([0, 1, 0])
 RIGHT_TURN = np.array([0, 0, 1])
+
+# actions 4
+
+UP = np.array([1, 0, 0, 0])
+DOWN = np.array([0, 1, 0, 0])
+LEFT = np.array([0, 0, 1, 0])
+RIGHT = np.array([0, 0, 0, 1])
 
 Point = namedtuple("Point", "x y")
 
@@ -41,7 +50,7 @@ class SnakeGameAI:
     AI controlled environment for the snake game
     """
 
-    def __init__(self, w=32, h=26):
+    def __init__(self, w=32, h=26, agent_type=3):
         """
         parameters:
             h [int] height
@@ -50,6 +59,9 @@ class SnakeGameAI:
         """
         self.w = w
         self.h = h
+
+        assert agent_type in (3, 4), "invalid agent type"
+        self.agent_type = agent_type
 
         # init environment
         self.display = pg.display.set_mode((self.w * BLOCK_SIZE + BLOCK_SIZE,
@@ -107,7 +119,10 @@ class SnakeGameAI:
                 quit()
 
         # movement phase
-        self._move(action)  # updates the head
+        if self.agent_type == 3:
+            self._move3(action)  # updates the head
+        else:
+            self._move4(action)  # updates the head
         self.snake.insert(0, self.head)
         # if no food is eaten then the last body piece will be popped
 
@@ -143,9 +158,9 @@ class SnakeGameAI:
         # end step
         return reward, game_over, self.score
 
-    def _move(self, action):
+    def _move3(self, action):
         """
-        helper function to move the snake according to action.
+        helper function to move the snake according to 3-action [turn left, straight, turn right]
         Determine in which direction the snake should move.
         """
         # determine direction based on action ~ maps action to direction
@@ -174,6 +189,28 @@ class SnakeGameAI:
         elif self.direction == Direction.DOWN:
             y += 1
         self.head = Point(x, y)
+        return
+
+    def _move4(self, action):
+        """
+        helper function to move the snake according to 4-action [up, down, left, right]
+        """
+        # get head coordinates
+        x = self.head.x
+        y = self.head.y
+
+        # update according to action
+        if np.array_equal(action, UP):
+            y += -1
+        elif np.array_equal(action, DOWN):
+            y += 1
+        elif np.array_equal(action, LEFT):
+            x += -1
+        elif np.array_equal(action, RIGHT):
+            x += 1
+
+        self.head = Point(x, y)
+        return
 
     def is_collision(self, pt=None):
         """
