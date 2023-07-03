@@ -33,7 +33,7 @@ class SuperAgent:
 
         # as a model we take a ffnn, input size is |S|, output size is |A|.
         pg_size = pg_x * pg_y
-        self.model = LinearQNet(3 * g_size, (pg_size*10)//8 * 8, 4)  # number of neurons in the hidden layer may be changed
+        self.model = LinearQNet(3 * pg_size, (pg_size*10)//8 * 8, 4)  # hidden layer size may be changed
         self.trainer = QTrainer(model=self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
 
     def get_state(self, game: SnakeGameAI):
