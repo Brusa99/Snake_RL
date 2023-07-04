@@ -5,10 +5,12 @@ import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 
-class TDControl():
+
+class TDControl:
     """
     implements SARSA TD-control (in-policy)
     """
+
     def __init__(self, state_size, action_size, gamma, lr):
         self.gamma = gamma  # discount factor
         self.lr = lr  # learning rate
@@ -27,7 +29,7 @@ class TDControl():
         if game_over:
             deltaQ = r + 0 - self.Qvalues[(*s, a)]  # +0 is the value of the terminal state
         else:
-            deltaQ = r + self.gamma*self.Qvalues[(*new_state, new_action)] - self.Qvalues[(*state, action)]
+            deltaQ = r + self.gamma * self.Qvalues[(*new_state, new_action)] - self.Qvalues[(*state, action)]
 
         # update
         self.Qvalues[(*s, a)] += self.lr_v * deltaQ
@@ -49,8 +51,6 @@ class TDControl():
             best_action = np.argmax(approx_value)
             action[best_action] = 1
         return action
-
-
 
 
 class LinearQNet(nn.Module):
@@ -144,4 +144,3 @@ class QTrainer:
         loss = self.criterion(target, pred_action)
         loss.backward()
         self.optimizer.step()
-

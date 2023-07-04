@@ -4,12 +4,13 @@ import numpy as np
 from collections import deque
 
 from AIGame import SnakeGameAI, Direction, Point
-from model import LinearQNet, QTrainer, SARSATrainer
+from model import LinearQNet, QTrainer, TDControl
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1_000
 LEARNING_RATE = .001
-EPSILON_ZERO = 80  # starting exploration parameter
+DISCOUNT_RATE = 0.9
+EPSILON_ZERO = 0.5  # starting exploration parameter
 
 
 class Agent:
@@ -26,15 +27,9 @@ class Agent:
         """
         self.n_games = 0
         self.epsilon = EPSILON_ZERO  # exploration parameter
-        self.gamma = 0.9  # must be in (0,1)
         self.memory = deque(maxlen=MAX_MEMORY)  # deque auto removes (FIFO) elements when len exceeds max parameter
 
-        # as a model we take a ffnn, input size is |S|, output size is |A|.
-        self.model = LinearQNet(11, 256, 3)  # number of neurons in the hidden layer may be changed
-
-        # choose the algorithm
-        # self.trainer = QTrainer(model=self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
-        self.trainer = SARSATrainer(model=self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
+        self.model = TDControl(11, 3, DISCOUNT_RATE, LEARNING_RATE)
 
     def get_state(self, game: SnakeGameAI):
         """
@@ -152,7 +147,7 @@ class Agent:
             head_x,
             head_y
         ]
-        return state
+        return np.array(state)
 
     def get_state_matrix(self, game: SnakeGameAI):
         """
@@ -210,7 +205,7 @@ class Agent:
         states, actions, new_states, rewards, next_action, game_overs = zip(*sample)  # unpacks sample and groups
 
         # train
-        self.trainer.train_step(states, actions, new_states, rewards, next_action, game_overs)
+        self.model.train_step(states, actions, new_states, rewards, next_action, game_overs)
         return
 
     def train_sm(self, state, action, reward, next_state, next_action, game_over):
@@ -218,31 +213,15 @@ class Agent:
         Trains the model on a single step.
         Also known as online learning.
         """
-        self.trainer.train_step(state, action, reward, next_state, next_action, game_over)
+        self.model.train_step(state, action, reward, next_state, next_action, game_over)
 
     def get_action(self, state):
         """
         Returns the action decided by the Agent.
-        The chance of doing a random action (EXPLORATION) is decided by the class attribute epsilon
         """
-        action = [0, 0, 0]
-
+        action = self.model.get_action(state, self.epsilon)
         # update epsilon
-        # method 1
-        # self.epsilon = EPSILON_ZERO - self.n_games  # note that epsilon can become negative => no more exploration
-        # method 2
-        self.epsilon = self.epsilon*0.99
-
-        # randomly take action with probability epsilon
-        if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)
-            action[move] = 1
-
-        # or choose best action
-        else:
-            state = th.tensor(state, dtype=th.float)  # convert to tensor for the nn model
-            prediction = self.model(state)  # outputs raw value
-            move = th.argmax(prediction).item()
-            action[move] = 1
-
+        self.epsilon = self.epsilon * 0.99
         return action
+
+
