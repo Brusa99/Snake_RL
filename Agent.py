@@ -154,6 +154,35 @@ class Agent:
         ]
         return state
 
+    def get_state_matrix(self, game: SnakeGameAI):
+        """
+        This function returns State pg_size+2-dimensional tuple that consist of:
+            a boolean for each cell of the playground that represents if the cell is blocked
+            food.x, food.y
+            head.x, head.y
+
+        The idea is that given full knowledge of the world the snake won't bottle itself
+        """
+        # find blocks
+        snake = np.zeros((self.pg_x + 2, self.pg_y + 2))
+        for pt in game.snake:
+            snake[pt.x, pt.y] = 11
+        snake = snake[1:-1, 1:-1]
+
+        # find food
+        food = np.zeros((self.pg_x + 2, self.pg_y + 2))
+        food[game.food.x, game.food.y] = 1
+        food = food[1:-1, 1:-1]
+
+        # find head
+        head = np.zeros((self.pg_x + 2, self.pg_y + 2))
+        head[game.head.x, game.head.y] = 1
+        head = head[1:-1, 1:-1]
+
+        # get state
+        state = np.concatenate((snake.flatten(), food.flatten(), head.flatten()))
+        return state
+
     def remember(self, state, action, reward, next_state, next_action, game_over):
         """
         Updates the memory of the Agent.

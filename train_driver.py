@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from IPython import display
 
 from Agent import Agent
-from Agent_pgmatrix import AgentMatrix
 from AIGame import SnakeGameAI
 
 plt.ion()
@@ -43,8 +42,6 @@ def train(file_name, steps, img_name):
     # agent/environment
     agent = Agent()
     environment = SnakeGameAI(w=8, h=8, agent_type=3)
-    # agent = SuperAgent(5, 5)
-    # environment = SnakeGameAI(w=5, h=5, agent_type=4)
 
     # train loop
     while agent.n_games <= steps:
