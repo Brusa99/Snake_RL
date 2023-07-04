@@ -4,7 +4,7 @@ import numpy as np
 from collections import deque
 
 from AIGame import SnakeGameAI, Direction, Point
-from model import LinearQNet, QTrainer
+from model import LinearQNet, QTrainer, SARSATrainer
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1_000
@@ -31,7 +31,10 @@ class Agent:
 
         # as a model we take a ffnn, input size is |S|, output size is |A|.
         self.model = LinearQNet(11, 256, 3)  # number of neurons in the hidden layer may be changed
-        self.trainer = QTrainer(model=self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
+
+        # choose the algorithm
+        # self.trainer = QTrainer(model=self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
+        self.trainer = SARSATrainer(model=self.model, learning_rate=LEARNING_RATE, gamma=self.gamma)
 
     def get_state(self, game: SnakeGameAI):
         """
@@ -151,13 +154,13 @@ class Agent:
         ]
         return state
 
-    def remember(self, state, action, reward, next_state, game_over):
+    def remember(self, state, action, reward, next_state, next_action, game_over):
         """
         Updates the memory of the Agent.
         The Agent has to keep track of the action a he took from state s to move to state s',
         along with the reward r and extra info regarding reaching the terminal state (game_over)
         """
-        self.memory.append((state, action, reward, next_state, game_over))
+        self.memory.append((state, action, reward, next_state, next_action, game_over))
         return None
 
     def train_lm(self):
@@ -175,18 +178,18 @@ class Agent:
             sample = self.memory
 
         # extract components by type
-        states, actions, new_states, rewards, game_overs = zip(*sample)  # unpacks sample and groups
+        states, actions, new_states, rewards, next_action, game_overs = zip(*sample)  # unpacks sample and groups
 
         # train
-        self.trainer.train_step(states, actions, new_states, rewards, game_overs)
+        self.trainer.train_step(states, actions, new_states, rewards, next_action, game_overs)
         return
 
-    def train_sm(self, state, action, reward, next_state, game_over):
+    def train_sm(self, state, action, reward, next_state, next_action, game_over):
         """
         Trains the model on a single step.
         Also known as online learning.
         """
-        self.trainer.train_step(state, action, reward, next_state, game_over)
+        self.trainer.train_step(state, action, reward, next_state, next_action, game_over)
 
     def get_action(self, state):
         """

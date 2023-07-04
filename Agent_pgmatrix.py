@@ -12,7 +12,7 @@ LEARNING_RATE = .001
 EPSILON_ZERO = 80  # starting exploration parameter
 
 
-class SuperAgent:
+class AgentMatrix:
     """
     Agent that learns and implements a policy on the environment AIGame
     """

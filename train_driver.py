@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from IPython import display
 
 from Agent import Agent
-from Agent_pgmatrix import SuperAgent
+from Agent_pgmatrix import AgentMatrix
 from AIGame import SnakeGameAI
 
 plt.ion()
@@ -41,10 +41,10 @@ def train(file_name, steps, img_name):
     record = 0
 
     # agent/environment
-    # agent = Agent()
-    # environment = SnakeGameAI(w=8, h=8, agent_type=3)
-    agent = SuperAgent(5, 5)
-    environment = SnakeGameAI(w=5, h=5, agent_type=4)
+    agent = Agent()
+    environment = SnakeGameAI(w=8, h=8, agent_type=3)
+    # agent = SuperAgent(5, 5)
+    # environment = SnakeGameAI(w=5, h=5, agent_type=4)
 
     # train loop
     while agent.n_games <= steps:
@@ -54,10 +54,11 @@ def train(file_name, steps, img_name):
         action = agent.get_action(state_old)
         reward, game_over, score = environment.play_step(action)
         state_new = agent.get_state(environment)
+        action_new = agent.get_action(state_new)
 
         # train
-        agent.train_sm(state_old, action, reward, state_new, game_over)
-        agent.remember(state_old, action, reward, state_new, game_over)
+        agent.train_sm(state_old, action, reward, state_new, action_new, game_over)
+        agent.remember(state_old, action, reward, state_new, action_new, game_over)
 
         # if tha game is lost: train long memory, reset game, plot partial results
         if game_over:

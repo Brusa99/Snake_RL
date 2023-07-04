@@ -8,7 +8,7 @@ from enum import Enum
 from collections import namedtuple
 
 BLOCK_SIZE = 40
-SPEED = 40
+SPEED = 400
 MAX_ITER = 100
 
 
