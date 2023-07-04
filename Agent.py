@@ -92,6 +92,65 @@ class Agent:
         # print("\nDangers:", *state[0:3], "\nDirections:", *state[3:7], "\nFood:", *state[7:])  # debug
         return np.array(state, dtype=int)  # int dtype to convert in 0,1 matrix
 
+    def get_state_plus(self, game: SnakeGameAI):
+        """
+        Like get_state but:
+        gives coordinate of food in [0,1]
+        gives coordinate of head in [0,1]
+        """
+        # get coordinates
+        food = game.food
+        food_x = food.x / game.w
+        food_y = food.y / game.h
+
+        head = game.head
+        head_x = head.x / game.w
+        head_y = head.y / game.h
+
+        # boolean direction
+        dir_up = game.direction == Direction.UP
+        dir_down = game.direction == Direction.DOWN
+        dir_left = game.direction == Direction.LEFT
+        dir_right = game.direction == Direction.RIGHT
+
+        # relative point
+        pt_up = Point(head.x, head.y - 1)
+        pt_down = Point(head.x, head.y + 1)
+        pt_left = Point(head.x - 1, head.y)
+        pt_right = Point(head.x + 1, head.y)
+
+        # state
+        state = [
+            # danger left
+            (dir_up and game.is_collision(pt_left)) or
+            (dir_down and game.is_collision(pt_right)) or
+            (dir_left and game.is_collision(pt_down)) or
+            (dir_right and game.is_collision(pt_up)),
+            # danger straight
+            (dir_up and game.is_collision(pt_up)) or
+            (dir_down and game.is_collision(pt_down)) or
+            (dir_left and game.is_collision(pt_left)) or
+            (dir_right and game.is_collision(pt_right)),
+            # danger right
+            (dir_up and game.is_collision(pt_right)) or
+            (dir_down and game.is_collision(pt_left)) or
+            (dir_left and game.is_collision(pt_up)) or
+            (dir_right and game.is_collision(pt_down)),
+
+            # directions
+            dir_left,
+            dir_right,
+            dir_up,
+            dir_down,
+
+            # coordinates
+            food_x,
+            food_y,
+            head_x,
+            head_y
+        ]
+        return state
+
     def remember(self, state, action, reward, next_state, game_over):
         """
         Updates the memory of the Agent.
@@ -105,9 +164,8 @@ class Agent:
         """
         Trains long memory which refers to memory between different games.
         When game_over state is reached, the agent trains long term memory.
-        Also known as experience replay.
-
-        Note that this function doesn't need any parameters since it accesses the agent's memory.
+        Also known as experience replay or batch updating.
+        Should prevent variance.
         """
         # We use the const BATCH_SIZE to determine how many tuples (S, A, R, S', GO) to use
         # If we have more than necessary we reduce by random sampling
@@ -125,7 +183,8 @@ class Agent:
 
     def train_sm(self, state, action, reward, next_state, game_over):
         """
-        Trains short memory, which refers to the current game.
+        Trains the model on a single step.
+        Also known as online learning.
         """
         self.trainer.train_step(state, action, reward, next_state, game_over)
 
