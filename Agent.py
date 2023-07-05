@@ -24,7 +24,9 @@ class Agent:
         self.n_games = 0
         self.epsilon = EPSILON_ZERO  # exploration parameter
 
-        self.model = TDControl((2,) * 11, 3, DISCOUNT_RATE, LEARNING_RATE, alg=alg)
+        self.model = TDControl((2,) * 11, 3, DISCOUNT_RATE, LEARNING_RATE, alg=alg)  # classic state
+        # MAP SIZE MUST BE INSERTED MANUALLY
+        # self.model = TDControl((4,) * 64, 4, DISCOUNT_RATE, LEARNING_RATE, alg=alg)  # matricial state
 
     def get_state(self, game: SnakeGameAI):
         """
@@ -87,31 +89,25 @@ class Agent:
 
     def get_state_matrix(self, game: SnakeGameAI):
         """
-        This function returns State pg_size+2-dimensional tuple that consist of:
-            a boolean for each cell of the playground that represents if the cell is blocked
-            food.x, food.y
-            head.x, head.y
-
-        The idea is that given full knowledge of the world the snake won't bottle itself
+        This function return an alternative state.
+        The state is given by the whole map/playground.
+        Each entry of the state can assume one of 4 values:
+            0 : empty
+            1 : block
+            2 : head
+            3 : food
         """
+        world = np.zeros((self.pg_x + 2, self.pg_y + 2))
+
         # find blocks
-        snake = np.zeros((self.pg_x + 2, self.pg_y + 2))
         for pt in game.snake:
-            snake[pt.x, pt.y] = 11
-        snake = snake[1:-1, 1:-1]
+            world[pt.x, pt.y] = 1
 
-        # find food
-        food = np.zeros((self.pg_x + 2, self.pg_y + 2))
-        food[game.food.x, game.food.y] = 1
-        food = food[1:-1, 1:-1]
+        # find food and head
+        world[game.food.x, game.food.y] = 3
+        world[game.head.x, game.head.y] = 2
 
-        # find head
-        head = np.zeros((self.pg_x + 2, self.pg_y + 2))
-        head[game.head.x, game.head.y] = 1
-        head = head[1:-1, 1:-1]
-
-        # get state
-        state = np.concatenate((snake.flatten(), food.flatten(), head.flatten()))
+        state = world[1:-1, 1:-1]
         return state
 
     def train_sm(self, state, action, reward, next_state, next_action, game_over):
