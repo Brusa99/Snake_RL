@@ -21,20 +21,16 @@ class Direction(Enum):
 
 # actions 3
 
-LEFT_TURN = np.array([1, 0, 0])
-STRAIGHT = np.array([0, 1, 0])
-RIGHT_TURN = np.array([0, 0, 1])
-
 LEFT_TURN = 0
 STRAIGHT = 1
 RIGHT_TURN = 2
 
 # actions 4
 
-UP = np.array([1, 0, 0, 0])
-DOWN = np.array([0, 1, 0, 0])
-LEFT = np.array([0, 0, 1, 0])
-RIGHT = np.array([0, 0, 0, 1])
+UP = 0
+DOWN = 1
+LEFT = 2
+RIGHT = 3
 
 Point = namedtuple("Point", "x y")
 
