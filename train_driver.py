@@ -113,9 +113,9 @@ def main(argv):
             file_name = "data/"
             file_name += arg
             # avoid overwriting
-            if os.path.exists(img_name + ".npy"):
+            if os.path.exists(file_name + ".npy"):
                 counter = 2
-                while os.path.exists(img_name + str(counter) + ".npy"):
+                while os.path.exists(file_name + str(counter) + ".npy"):
                     counter += 1
                 file_name += str(counter) + ".npy"
             else:

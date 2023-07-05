@@ -11,9 +11,10 @@ python Game.py
 ```
 
 To train a model for `S` steps, save it to `model`
-and save an image of the scores as `image`, run:
+and save an image of the scores as `image`,
+using an `algorithm` among _SARSA, expected SARSA, Q-learning_, run:
 ```bash
-python train_driver.py -f model -s S -n image
+python train_driver.py -f model -s S -n image -a algorithm
 ```
 
 ## Content
@@ -23,7 +24,4 @@ python train_driver.py -f model -s S -n image
 - `Agent.py` Implementation of the agent that takes actions based on the states.
 The decision process is decided by the model.
 The training phase is handled by the provided trainer.  
-- `data/` contains the trained models along with a graph of their score  
--- `deponsteps` is trained with epsilon0 = 80, epsilon_t = epsilon_0 - # of games  
--- `eps099` is trained with epsilon0 = 80, at each iteration epsilon <- 0.99 * epsilon  
--- `increasedpen` is trained with negative rewards multiplied by 1003
+- `data/` contains the trained models, a graph of their training along with the arrays used for the plot  
