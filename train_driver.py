@@ -29,7 +29,7 @@ def plot(scores, mean_scores):
     plt.pause(.1)
 
 
-def train(file_name, steps, img_name):
+def train(file_name, steps, img_name, alg):
     """
     trains the agent
     """
@@ -40,7 +40,7 @@ def train(file_name, steps, img_name):
     record = 0
 
     # agent/environment
-    agent = Agent()
+    agent = Agent(alg=alg)
     environment = SnakeGameAI(w=8, h=8, agent_type=3)
 
     # train loop
@@ -84,17 +84,19 @@ def main(argv):
     # init variables
     file_name = "data/model.pth"
     img_name = "data/graph.png"
+    alg = "SARSA"
     steps = 10000
 
     # get command line arguments
-    opts, args = getopt.getopt(argv, "hf:s:n:", ["file=", "steps=", "name="])
+    opts, args = getopt.getopt(argv, "hf:s:n:a:", ["file=", "steps=", "name=", "alg="])
     for opt, arg in opts:
         # help
         if opt == "-h":
-            print("train_driver.py -f <filename> -s <steps>")
+            print("train_driver.py -f <filename> -s <steps> -n <imgname> -a <algorithm>")
             print("\t-f path to output file")
             print("\t-s steps to perform")
             print("\t-n name of the image to save")
+            print("\t-a algorithm for td-error")
             print("saved models/image are put in the data directory, extension is automatically added")
             sys.exit()
         # output file
@@ -117,9 +119,12 @@ def main(argv):
                 img_name += str(counter) + ".png"
             else:
                 img_name += ".png"
+        # algorithm
+        elif opt in ("-a", "--alg"):
+            alg = arg
 
     # execute
-    train(file_name=file_name, steps=steps, img_name=img_name)
+    train(file_name=file_name, steps=steps, img_name=img_name, alg=alg)
 
 
 if __name__ == "__main__":

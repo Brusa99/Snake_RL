@@ -18,7 +18,7 @@ class Agent:
     Agent that learns and implements a policy on the environment AIGame
     """
 
-    def __init__(self):
+    def __init__(self, alg="SARSA"):
         """
         n_games [int] : how many games the agent has played
         epsilon [float] : greedy policy control
@@ -29,7 +29,7 @@ class Agent:
         self.epsilon = EPSILON_ZERO  # exploration parameter
         self.memory = deque(maxlen=MAX_MEMORY)  # deque auto removes (FIFO) elements when len exceeds max parameter
 
-        self.model = TDControl((2,)*11, 3, DISCOUNT_RATE, LEARNING_RATE)
+        self.model = TDControl((2,)*11, 3, DISCOUNT_RATE, LEARNING_RATE, alg=alg)
 
     def get_state(self, game: SnakeGameAI):
         """

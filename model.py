@@ -8,14 +8,20 @@ import numpy as np
 
 class TDControl:
     """
-    implements SARSA TD-control (in-policy)
+    Implements in-policy TD-control through linear approximation.
+    Algorithms can be chosen between: "SARSA", "expSARSA", "Q-Learning"
     """
 
-    def __init__(self, state_size, action_size, gamma, lr):
+    def __init__(self, state_size, action_size, gamma, lr, alg="SARSA"):
         self.gamma = gamma  # discount factor
         self.lr = lr  # learning rate
         self.state_size = state_size  # as a tuple
         self.action_size = action_size
+
+        # TD error
+        assert alg in ("SARSA", "expSARSA", "Q-Learning"), \
+            "invalid algorithm valid arguments are: SARSA, expSARSA, Q-Learning"
+        self.alg = alg
 
         # approximations of Q-values
         self.values = np.zeros((*self.state_size, self.action_size))
@@ -24,12 +30,26 @@ class TDControl:
         """
         Single training step with the SARSA algorithm.
         """
-        # SARSA
-        # Q(s,a) <- Q(s,a) + lr * [ r + Q(s',a') - Q(s,a) ]
-        if game_over:
-            delta = reward - self.values[(*state, action)]  # value of the terminal state is 0
-        else:
-            delta = reward + self.gamma * self.values[(*new_state, new_action)] - self.values[(*state, action)]
+        if self.alg == "SARSA":
+            # SARSA
+            # Q(s,a) <- Q(s,a) + lr * [ r + Q(s',a') - Q(s,a) ]
+            if game_over:
+                delta = reward - self.values[(*state, action)]  # value of the terminal state is 0
+            else:
+                delta = reward + self.gamma * self.values[(*new_state, new_action)] - self.values[(*state, action)]
+        if self.alg == "expSARSA":
+            # Expected SARSA
+            if game_over:
+                delta = reward - self.values[(*state, action)]
+            else:
+                delta = reward + \
+                        self.gamma * np.dot(self.values[(*new_state,)], self.get_policy(new_state)) - \
+                        self.values[(*state, action)]
+        if self.alg == "Q-Learning":
+            if game_over:
+                delta = reward - self.values[(*state, action)]
+            else:
+                delta = reward + self.gamma * np.max(self.values[(*new_state,)]) - self.values[(*state, action)]
 
         # update
         self.values[(*state, action)] += self.lr * delta
@@ -49,6 +69,16 @@ class TDControl:
             prob_actions = best_actions / np.sum(best_actions)
         action = np.random.choice(self.action_size, p=prob_actions)
         return action
+
+    def get_policy(self, state):
+        """
+        like get_action but returns vector of probabilities for each action
+        """
+        policy = np.ones(self.action_size) / self.action_size
+        best_value = np.max(self.values[(*state,)])
+        best_actions = (self.values[(*state,)] == best_value)
+        policy += best_actions / np.sum(best_actions)
+        return policy
 
 
 class LinearQNet(nn.Module):
