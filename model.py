@@ -80,6 +80,11 @@ class TDControl:
         policy += best_actions / np.sum(best_actions)
         return policy
 
+    def save(self, file):
+        """
+        saves the matrix in a .npy format
+        """
+        np.save(file, self.values)
 
 class LinearQNet(nn.Module):
     """

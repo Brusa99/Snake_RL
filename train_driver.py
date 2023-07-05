@@ -3,6 +3,7 @@ import sys
 import getopt
 import matplotlib.pyplot as plt
 from IPython import display
+import  numpy as np
 
 from Agent import Agent
 from AIGame import SnakeGameAI
@@ -70,19 +71,26 @@ def train(file_name, steps, img_name, alg):
 
             if score > record:
                 record = score
-                # agent.model.save(file_name)
 
             # plot
             print("Game: {}, Score: {}, Record: {}".format(agent.n_games, score, record))
             plot(plot_scores, plot_mean_scores)
 
-    # save images
+    # save model
+    agent.model.save(file_name)
+
+    # save scores
+    plot_scores = np.array(plot_scores)
+    plot_mean_scores = np.array(plot_mean_scores)
+    np.savez(file_name[:-4], arr1=plot_scores, arr2=plot_mean_scores)
+
+    # save figure
     plt.savefig(img_name)
 
 
 def main(argv):
     # init variables
-    file_name = "data/model.pth"
+    file_name = "data/model.npy"
     img_name = "data/graph.png"
     alg = "SARSA"
     steps = 10000
@@ -99,14 +107,24 @@ def main(argv):
             print("\t-a algorithm for td-error")
             print("saved models/image are put in the data directory, extension is automatically added")
             sys.exit()
+
         # output file
         elif opt in ("-f", "--file"):
             file_name = "data/"
             file_name += arg
-            file_name += ".pth"
+            # avoid overwriting
+            if os.path.exists(img_name + ".npy"):
+                counter = 2
+                while os.path.exists(img_name + str(counter) + ".npy"):
+                    counter += 1
+                file_name += str(counter) + ".npy"
+            else:
+                file_name += ".npy"
+
         # steps
         elif opt in ("-s", "--steps"):
             steps = int(arg)
+
         # image name
         elif opt in ("-n", "--name"):
             img_name = "data/"
@@ -119,6 +137,7 @@ def main(argv):
                 img_name += str(counter) + ".png"
             else:
                 img_name += ".png"
+
         # algorithm
         elif opt in ("-a", "--alg"):
             alg = arg
