@@ -3,7 +3,7 @@ import sys
 import getopt
 import matplotlib.pyplot as plt
 from IPython import display
-import  numpy as np
+import numpy as np
 
 from Agent import Agent
 from AIGame import SnakeGameAI
@@ -55,14 +55,12 @@ def train(file_name, steps, img_name, alg):
 
         # train
         agent.train_sm(state, action, reward, state_new, action_new, game_over)
-        agent.remember(state, action, reward, state_new, action_new, game_over)
 
         # if tha game is lost: train long memory, reset game, plot partial results
         if game_over:
             # train and reset environment
             environment.reset()
             agent.n_games += 1
-            # agent.train_lm()
 
             # save scores
             plot_scores.append(score)
