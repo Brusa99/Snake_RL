@@ -8,7 +8,7 @@ from enum import Enum
 from collections import namedtuple
 
 BLOCK_SIZE = 40
-SPEED = 400
+SPEED = 40
 MAX_ITER = 100
 
 
@@ -24,6 +24,10 @@ class Direction(Enum):
 LEFT_TURN = np.array([1, 0, 0])
 STRAIGHT = np.array([0, 1, 0])
 RIGHT_TURN = np.array([0, 0, 1])
+
+LEFT_TURN = 0
+STRAIGHT = 1
+RIGHT_TURN = 2
 
 # actions 4
 

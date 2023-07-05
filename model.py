@@ -14,11 +14,11 @@ class TDControl:
     def __init__(self, state_size, action_size, gamma, lr):
         self.gamma = gamma  # discount factor
         self.lr = lr  # learning rate
-        self.state_size = state_size
+        self.state_size = state_size  # as a tuple
         self.action_size = action_size
 
         # approximations of Q-values
-        self.Qvalues = np.zeros((*self.state_size, self.action_size))
+        self.values = np.zeros((*self.state_size, self.action_size))
 
     def train_step(self, state, action, reward, new_state, new_action, game_over):
         """
@@ -27,29 +27,27 @@ class TDControl:
         # SARSA
         # Q(s,a) <- Q(s,a) + lr * [ r + Q(s',a') - Q(s,a) ]
         if game_over:
-            deltaQ = r + 0 - self.Qvalues[(*s, a)]  # +0 is the value of the terminal state
+            delta = reward - self.values[(*state, action)]  # value of the terminal state is 0
         else:
-            deltaQ = r + self.gamma * self.Qvalues[(*new_state, new_action)] - self.Qvalues[(*state, action)]
+            delta = reward + self.gamma * self.values[(*new_state, new_action)] - self.values[(*state, action)]
 
         # update
-        self.Qvalues[(*s, a)] += self.lr_v * deltaQ
+        self.values[(*state, action)] += self.lr * delta
 
     def get_action(self, state, epsilon=0):
         """
         Returns the action with an epsilon-greedy policy.
         For epsilon=0 always returns the best action
         """
-        action = np.zeros(self.action_size)
-
         # epsilon probability to take a random action
         if np.random.rand() < epsilon:
-            move = random.randint(0, self.action_size)
-            action[move] = 1
+            prob_actions = np.ones(self.action_size) / self.action_size
         # else take the best action
         else:
-            approx_value = self.Qvalues[(*state,)]
-            best_action = np.argmax(approx_value)
-            action[best_action] = 1
+            best_value = np.max(self.values[(*state,)])
+            best_actions = (self.values[(*state,)] == best_value)
+            prob_actions = best_actions / np.sum(best_actions)
+        action = np.random.choice(self.action_size, p=prob_actions)
         return action
 
 

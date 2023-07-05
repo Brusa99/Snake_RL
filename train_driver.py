@@ -45,24 +45,23 @@ def train(file_name, steps, img_name):
 
     # train loop
     while agent.n_games <= steps:
-        state_old = agent.get_state(game=environment)
-
-        # move
-        action = agent.get_action(state_old)
+        # step
+        state = agent.get_state(game=environment)
+        action = agent.get_action(state)
         reward, game_over, score = environment.play_step(action)
         state_new = agent.get_state(environment)
         action_new = agent.get_action(state_new)
 
         # train
-        agent.train_sm(state_old, action, reward, state_new, action_new, game_over)
-        agent.remember(state_old, action, reward, state_new, action_new, game_over)
+        agent.train_sm(state, action, reward, state_new, action_new, game_over)
+        agent.remember(state, action, reward, state_new, action_new, game_over)
 
         # if tha game is lost: train long memory, reset game, plot partial results
         if game_over:
             # train and reset environment
             environment.reset()
             agent.n_games += 1
-            agent.train_lm()
+            # agent.train_lm()
 
             # save scores
             plot_scores.append(score)
@@ -71,7 +70,7 @@ def train(file_name, steps, img_name):
 
             if score > record:
                 record = score
-                agent.model.save(file_name)
+                # agent.model.save(file_name)
 
             # plot
             print("Game: {}, Score: {}, Record: {}".format(agent.n_games, score, record))

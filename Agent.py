@@ -29,7 +29,7 @@ class Agent:
         self.epsilon = EPSILON_ZERO  # exploration parameter
         self.memory = deque(maxlen=MAX_MEMORY)  # deque auto removes (FIFO) elements when len exceeds max parameter
 
-        self.model = TDControl(11, 3, DISCOUNT_RATE, LEARNING_RATE)
+        self.model = TDControl((2,)*11, 3, DISCOUNT_RATE, LEARNING_RATE)
 
     def get_state(self, game: SnakeGameAI):
         """
@@ -58,7 +58,7 @@ class Agent:
         pt_right = Point(head.x + 1, head.y)
 
         # state
-        state = [
+        state = (
             # danger left
             (dir_up and game.is_collision(pt_left)) or
             (dir_down and game.is_collision(pt_right)) or
@@ -86,7 +86,7 @@ class Agent:
             food.x > head.x,  # right
             food.y < head.y,  # up
             food.y > head.y,  # down
-        ]
+        )
         # print("\nDangers:", *state[0:3], "\nDirections:", *state[3:7], "\nFood:", *state[7:])  # debug
         return np.array(state, dtype=int)  # int dtype to convert in 0,1 matrix
 
