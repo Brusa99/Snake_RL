@@ -127,3 +127,9 @@ class Agent:
         # update epsilon
         self.epsilon = self.epsilon * 0.99
         return action
+
+    def get_action_greedy(self, state):
+        """
+        Returns the greedy action chosen by the agent given a state
+        """
+        return self.model.get_action(state)

@@ -84,3 +84,9 @@ class TDControl:
         saves the matrix in a .npy format
         """
         np.save(file, self.values)
+
+    def load(self, file: str):
+        """
+        given the path to a QValues matrix, loads it in the model
+        """
+        self.values = np.load(file)
