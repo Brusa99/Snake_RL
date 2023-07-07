@@ -25,8 +25,10 @@ class Agent:
         self.epsilon = EPSILON_ZERO  # exploration parameter
 
         self.model = TDControl((2,) * 11, 3, DISCOUNT_RATE, LEARNING_RATE, alg=alg)  # classic state
-        # MAP SIZE MUST BE INSERTED MANUALLY
-        # self.model = TDControl((4,) * 64, 4, DISCOUNT_RATE, LEARNING_RATE, alg=alg)  # matricial state
+
+        # To use whole map for states, use this model (also have to change in train driver which agent_type + get_state)
+        # moreover it won't work since max dimension for a ndarray is 32
+        # self.model = TDControl((4,) * 64, 4, DISCOUNT_RATE, LEARNING_RATE, alg=alg)  # material state
 
     def get_state(self, game: SnakeGameAI):
         """
