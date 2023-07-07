@@ -21,6 +21,12 @@ using an `algorithm` among _SARSA, expected SARSA, Q-learning_, run:
 python train_driver.py -f model -s S -n name -a algorithm
 ```
 
+To make a `model` (as a `.npy` file) play the game, run:
+```bash
+python main.py model width height
+```
+where `width` and `height` are optional arguments that change the size of the board.
+
 ## Content
 
 - `Game.py` human playable implementation of the game.  
