@@ -24,7 +24,7 @@ class TDControl:
 
     def train_step(self, state, action, reward, new_state, new_action, game_over):
         """
-        Single training step with the SARSA algorithm.
+        Single TD training step with the chosen algorithm.
         """
         if self.alg == "SARSA":
             # SARSA
@@ -87,6 +87,7 @@ class TDControl:
 
     def load(self, file: str):
         """
-        given the path to a QValues matrix, loads it in the model
+		Loads the QValues matrix in the model.
+		The input must be a relative path to a .npy file storing an appropriate matrix.
         """
         self.values = np.load(file)

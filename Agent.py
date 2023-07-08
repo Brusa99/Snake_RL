@@ -1,10 +1,8 @@
-import torch as th
 import numpy as np
-
 from AIGame import SnakeGameAI, Direction, Point
 from model import TDControl
 
-LEARNING_RATE = .001
+LEARNING_RATE = .001  # lr shouldn't be constant but time dependent
 DISCOUNT_RATE = 0.9
 EPSILON_ZERO = 0.5  # starting exploration parameter
 
@@ -18,8 +16,6 @@ class Agent:
         """
         n_games [int] : how many games the agent has played
         epsilon [float] : greedy policy control
-        gamma [float] : discount rate
-        memory [deque] : agent memory
         """
         self.n_games = 0
         self.epsilon = EPSILON_ZERO  # exploration parameter
@@ -110,7 +106,7 @@ class Agent:
         world[game.head.x, game.head.y] = 2
 
         state = world[1:-1, 1:-1]
-        return state
+        return state.flatten()
 
     def train_sm(self, state, action, reward, next_state, next_action, game_over):
         """

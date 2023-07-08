@@ -137,7 +137,6 @@ class SnakeGameAI:
             return reward, game_over, self.score
 
         # if snake is doing nothing for too long => game over
-        # might replace with a small negative reward at each iteration
         if self.iteration > MAX_ITER * len(self.snake):
             game_over = True
             reward = -10
