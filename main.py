@@ -23,6 +23,7 @@ def run(model: str, w=8, h=8):
         reward, game_over, score = environment.play_step(action)
 
         if game_over:
+            agent.n_games += 1
             environment.reset()
             if score > record:
                 record = score
